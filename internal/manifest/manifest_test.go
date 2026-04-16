@@ -3,6 +3,7 @@ package manifest
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -74,6 +75,35 @@ func TestRenderInitTemplateProducesQuotedRoot(t *testing.T) {
 
 	if want := `root: "/tmp/Example App"`; !containsLine(body, want) {
 		t.Fatalf("expected %q in template:\n%s", want, body)
+	}
+}
+
+func TestRenderInitTemplateFrontendUsesFrontendCommands(t *testing.T) {
+	body, err := RenderInitTemplate(InitConfig{
+		Name:   "Example Frontend",
+		Root:   filepath.Join(string(os.PathSeparator), "tmp", "Example Frontend"),
+		Layout: "frontend",
+	})
+	if err != nil {
+		t.Fatalf("RenderInitTemplate returned error: %v", err)
+	}
+
+	for _, want := range []string{
+		`layout: frontend`,
+		`run: npm run dev`,
+		`run: npm test`,
+		`- role: server`,
+		`- role: tests`,
+	} {
+		if !strings.Contains(body, want) {
+			t.Fatalf("expected %q in template:\n%s", want, body)
+		}
+	}
+}
+
+func TestRenderInitTemplateRejectsUnknownLayout(t *testing.T) {
+	if _, err := RenderInitTemplate(InitConfig{Root: ".", Layout: "weird"}); err == nil {
+		t.Fatal("expected unknown layout error")
 	}
 }
 

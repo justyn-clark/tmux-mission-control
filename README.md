@@ -46,6 +46,14 @@ Generate a starter manifest for a repo:
 ./bin/tmc init --root /absolute/path/to/repo --output project.yml --layout dev
 ```
 
+Layout-specific scaffolds are opinionated on purpose:
+
+- `dev` -> editor, shell, tests, logs with Go-friendly defaults
+- `backend` -> editor, shell, server, logs
+- `frontend` -> editor, shell, dev server, tests, logs with npm defaults
+- `ops` -> shell, service, logs, docs
+- `agent-lab` -> editor, shell, tests, logs, agent, docs
+
 Preview the exact actions:
 
 ```bash
@@ -126,14 +134,14 @@ Built-in layout presets:
 - `ops`
 - `agent-lab`
 
-See [docs/layouts.md](/Users/justin/Documents/Justyn Clark Network/REPOS/tmux-mission-control/docs/layouts.md) for pane-role ordering and ASCII diagrams.
+See [docs/layouts.md](docs/layouts.md) for pane-role ordering and ASCII diagrams.
 
 ## Docs
 
-- [docs/manifest-spec.md](/Users/justin/Documents/Justyn Clark Network/REPOS/tmux-mission-control/docs/manifest-spec.md)
-- [docs/layouts.md](/Users/justin/Documents/Justyn Clark Network/REPOS/tmux-mission-control/docs/layouts.md)
-- [docs/doctor.md](/Users/justin/Documents/Justyn Clark Network/REPOS/tmux-mission-control/docs/doctor.md)
-- [docs/examples.md](/Users/justin/Documents/Justyn Clark Network/REPOS/tmux-mission-control/docs/examples.md)
+- [docs/manifest-spec.md](docs/manifest-spec.md)
+- [docs/layouts.md](docs/layouts.md)
+- [docs/doctor.md](docs/doctor.md)
+- [docs/examples.md](docs/examples.md)
 
 ## Notes
 

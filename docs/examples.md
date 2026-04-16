@@ -1,6 +1,6 @@
 # Examples
 
-The repository ships five example manifests in [examples](/Users/justin/Documents/Justyn Clark Network/REPOS/tmux-mission-control/examples).
+The repository ships five example manifests in [`examples/`](../examples).
 
 ## Included Manifests
 
@@ -18,6 +18,8 @@ The repository ships five example manifests in [examples](/Users/justin/Document
 4. Run `tmc doctor --file <example>`.
 5. Run `tmc dry-run --file <example>`.
 6. Run `tmc start --file <example>`.
+
+If you are starting from scratch instead of copying an example, use `tmc init --layout <layout>` first, then edit the generated manifest.
 
 ## Example Patterns
 

@@ -310,7 +310,12 @@ func RenderInitTemplate(cfg InitConfig) (string, error) {
 	if layout == "" {
 		layout = "dev"
 	}
+	if !isSupportedLayout(layout) {
+		return "", fmt.Errorf("unsupported init layout %q", layout)
+	}
 	session := sanitizeName(name)
+
+	blueprint := initBlueprintForLayout(layout)
 
 	return fmt.Sprintf(`version: 1
 name: %q
@@ -321,22 +326,118 @@ attach: true
 env:
   TMC_PROJECT: %q
 commands:
-  tests:
-    run: go test ./...
-  logs:
-    run: tail -F ./tmp/app.log
+%s
 windows:
   - name: workspace
     layout: %s
     panes:
-      - role: editor
+%s
+`, name, root, session, shellOrDefault(), name, blueprint.commandsYAML, layout, blueprint.panesYAML), nil
+}
+
+type initBlueprint struct {
+	commandsYAML string
+	panesYAML    string
+}
+
+func isSupportedLayout(layout string) bool {
+	_, ok := map[string]struct{}{
+		"dev":       {},
+		"backend":   {},
+		"frontend":  {},
+		"ops":       {},
+		"agent-lab": {},
+	}[layout]
+	return ok
+}
+
+func initBlueprintForLayout(layout string) initBlueprint {
+	switch layout {
+	case "backend":
+		return initBlueprint{
+			commandsYAML: `  server:
+    run: go run ./...
+  logs:
+    run: tail -F ./tmp/app.log`,
+			panesYAML: `      - role: editor
+        command: "${EDITOR:-nvim} ."
+      - role: shell
+      - role: server
+        command_ref: server
+      - role: logs
+        command_ref: logs`,
+		}
+	case "frontend":
+		return initBlueprint{
+			commandsYAML: `  server:
+    run: npm run dev
+  tests:
+    run: npm test
+  logs:
+    run: tail -F ./tmp/frontend.log`,
+			panesYAML: `      - role: editor
+        command: "${EDITOR:-nvim} ."
+      - role: shell
+      - role: server
+        command_ref: server
+      - role: tests
+        command_ref: tests
+      - role: logs
+        command_ref: logs`,
+		}
+	case "ops":
+		return initBlueprint{
+			commandsYAML: `  service:
+    run: make run
+  logs:
+    run: tail -F ./tmp/service.log
+  docs:
+    run: less README.md`,
+			panesYAML: `      - role: shell
+      - role: server
+        command_ref: service
+      - role: logs
+        command_ref: logs
+      - role: docs
+        command_ref: docs`,
+		}
+	case "agent-lab":
+		return initBlueprint{
+			commandsYAML: `  tests:
+    run: npm test
+  logs:
+    run: tail -F ./tmp/agent.log
+  agent:
+    run: codex
+  docs:
+    run: less README.md`,
+			panesYAML: `      - role: editor
         command: "${EDITOR:-nvim} ."
       - role: shell
       - role: tests
         command_ref: tests
       - role: logs
         command_ref: logs
-`, name, root, session, shellOrDefault(), name, layout), nil
+      - role: agent
+        command_ref: agent
+      - role: docs
+        command_ref: docs`,
+		}
+	default:
+		return initBlueprint{
+			commandsYAML: `  tests:
+    run: go test ./...
+  logs:
+    run: tail -F ./tmp/app.log`,
+			panesYAML: `      - role: editor
+        command: "${EDITOR:-nvim} ."
+      - role: shell
+      - role: tests
+        command_ref: tests
+      - role: logs
+        command_ref: logs`,
+		}
+	}
 }
 
 func shellOrDefault() string {
