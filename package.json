@@ -1,0 +1,12 @@
+{
+  "name": "tmux-mission-control",
+  "private": true,
+  "description": "Terminal-first tmux workspace launcher tooling",
+  "scripts": {
+    "format:js": "biome format --write .",
+    "check:js": "biome check ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4"
+  }
+}

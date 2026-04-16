@@ -1,0 +1,29 @@
+version: 1
+name: "go-service"
+root: "/absolute/path/to/go-service"
+session: "go-service"
+shell: "/bin/zsh"
+attach: false
+env:
+  GO_ENV: "development"
+commands:
+  server:
+    run: "go run ./cmd/service"
+  tests:
+    run: "watchexec -r -- go test ./..."
+  logs:
+    run: "tail -F ./tmp/service.log"
+startup_hooks:
+  - name: "download modules"
+    command: "go mod download"
+windows:
+  - name: "workspace"
+    layout: "backend"
+    panes:
+      - role: "editor"
+        command: "${EDITOR:-nvim} ."
+      - role: "shell"
+      - role: "server"
+        command_ref: "server"
+      - role: "logs"
+        command_ref: "logs"

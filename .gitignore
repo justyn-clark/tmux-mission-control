@@ -1,0 +1,6 @@
+.small-cache/
+.small-runs/
+.small-archive/
+bin/
+node_modules/
+.ruff_cache/

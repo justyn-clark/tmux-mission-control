@@ -1,0 +1,47 @@
+version: 1
+name: "dual-app"
+root: "/absolute/path/to/full-stack-app"
+session: "dual-app"
+shell: "/bin/zsh"
+attach: false
+commands:
+  api:
+    run: "go run ./cmd/api"
+    cwd: "./backend"
+  api-logs:
+    run: "tail -F ./tmp/api.log"
+    cwd: "./backend"
+  web:
+    run: "npm run dev"
+    cwd: "./frontend"
+  web-tests:
+    run: "npm test -- --watch"
+    cwd: "./frontend"
+  web-logs:
+    run: "tail -F ./tmp/web.log"
+    cwd: "./frontend"
+windows:
+  - name: "backend"
+    layout: "backend"
+    root: "./backend"
+    panes:
+      - role: "editor"
+        command: "${EDITOR:-nvim} ."
+      - role: "shell"
+      - role: "server"
+        command_ref: "api"
+      - role: "logs"
+        command_ref: "api-logs"
+  - name: "frontend"
+    layout: "frontend"
+    root: "./frontend"
+    panes:
+      - role: "editor"
+        command: "${EDITOR:-nvim} ."
+      - role: "shell"
+      - role: "server"
+        command_ref: "web"
+      - role: "tests"
+        command_ref: "web-tests"
+      - role: "logs"
+        command_ref: "web-logs"

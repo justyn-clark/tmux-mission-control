@@ -1,0 +1,30 @@
+small_version: "1.0.0"
+owner: "agent"
+tasks:
+  - id: "task-1"
+    title: "Define manifest schema and layout presets"
+    steps:
+      - "Design a YAML manifest format for projects, windows, panes, env, commands, and hooks."
+      - "Define deterministic tmux layout presets for dev, backend, frontend, ops, and agent-lab."
+    acceptance:
+      - "Manifest loader validates required fields and resolves relative paths."
+      - "Layout expansion maps ordered panes onto preset split plans."
+  - id: "task-2"
+    title: "Implement Go CLI and tmux orchestration"
+    steps:
+      - "Build the tmc CLI with init, start, stop, list, status, doctor, dry-run, and completion commands."
+      - "Plan and execute tmux session bootstrap, pane creation, command dispatch, and shutdown."
+    acceptance:
+      - "A manifest can bootstrap a detached or attached tmux session."
+      - "Dry-run prints the exact commands without mutating tmux state."
+      - "Status reports panes, roles, commands, and tracked exit codes."
+  - id: "task-3"
+    title: "Ship examples, docs, and verification coverage"
+    steps:
+      - "Add example manifests for Go, React, Python, dual-app, and agent-lab workspaces."
+      - "Document the manifest spec, layouts, doctor behavior, and examples."
+      - "Add Go tests and smoke-test the lifecycle on a real tmux server."
+    acceptance:
+      - "Repository includes README plus docs/manifest-spec.md, docs/layouts.md, docs/doctor.md, and docs/examples.md."
+      - "go test ./... passes."
+      - "tmc doctor, dry-run, start, status, and stop have been exercised locally."

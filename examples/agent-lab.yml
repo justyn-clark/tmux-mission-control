@@ -1,0 +1,32 @@
+version: 1
+name: "agent-lab"
+root: "/absolute/path/to/agent-lab"
+session: "agent-lab"
+shell: "/bin/zsh"
+attach: false
+env:
+  OPENAI_LOG: "info"
+commands:
+  tests:
+    run: "watchexec -r -- go test ./..."
+  logs:
+    run: "tail -F ./tmp/agent.log"
+  agent:
+    run: "codex"
+  docs:
+    run: "less docs/plan.md"
+windows:
+  - name: "lab"
+    layout: "agent-lab"
+    panes:
+      - role: "editor"
+        command: "${EDITOR:-nvim} ."
+      - role: "shell"
+      - role: "tests"
+        command_ref: "tests"
+      - role: "logs"
+        command_ref: "logs"
+      - role: "agent"
+        command_ref: "agent"
+      - role: "docs"
+        command_ref: "docs"

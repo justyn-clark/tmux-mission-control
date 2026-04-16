@@ -1,0 +1,21 @@
+small_version: "1.0.0"
+owner: agent
+entries:
+    - command: small init
+      evidence: Initialized .small workspace and seeded canonical artifacts
+      notes: small init in /Users/justin/Documents/Justyn Clark Network/REPOS/tmux-mission-control
+      status: completed
+      task_id: meta/init
+      timestamp: "2026-04-16T05:00:10.288867000Z"
+    - command: go test ./... && go build -o ./bin/tmc ./cmd/tmc
+      evidence: Implemented the Go CLI, manifest loader, tmux planner, doctor checks, status reporting, docs, and examples; build and unit tests passed.
+      notes: Verified packages under cmd/, internal/, docs/, and examples/ with go test and a successful binary build.
+      status: completed
+      task_id: task-2
+      timestamp: "2026-04-16T05:17:36Z"
+    - command: ./bin/tmc doctor --file \"$tmpdir/project.yml\" && ./bin/tmc dry-run --file \"$tmpdir/project.yml\" && ./bin/tmc start --file \"$tmpdir/project.yml\" && ./bin/tmc status --session tmc-smoke && ./bin/tmc stop --session tmc-smoke
+      evidence: Ran end-to-end smoke tests against a temporary manifest and confirmed doctor, dry-run, detached start, status, exit tracking, and stop behavior on a live tmux server.
+      notes: Also validated tmc init with a root path containing spaces and confirmed the generated manifest passed doctor and dry-run.
+      status: completed
+      task_id: task-3
+      timestamp: "2026-04-16T05:17:36Z"

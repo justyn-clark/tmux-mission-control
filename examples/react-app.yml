@@ -1,0 +1,28 @@
+version: 1
+name: "react-app"
+root: "/absolute/path/to/react-app"
+session: "react-app"
+shell: "/bin/zsh"
+attach: false
+env:
+  NODE_ENV: "development"
+commands:
+  dev:
+    run: "npm run dev"
+  tests:
+    run: "npm test -- --watch"
+  logs:
+    run: "tail -F ./tmp/frontend.log"
+windows:
+  - name: "frontend"
+    layout: "frontend"
+    panes:
+      - role: "editor"
+        command: "${EDITOR:-nvim} ."
+      - role: "shell"
+      - role: "server"
+        command_ref: "dev"
+      - role: "tests"
+        command_ref: "tests"
+      - role: "logs"
+        command_ref: "logs"

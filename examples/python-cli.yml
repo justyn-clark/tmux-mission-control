@@ -1,0 +1,24 @@
+version: 1
+name: "python-cli"
+root: "/absolute/path/to/python-cli"
+session: "python-cli"
+shell: "/bin/zsh"
+attach: false
+env:
+  PYTHONUNBUFFERED: "1"
+commands:
+  tests:
+    run: "pytest -q"
+  docs:
+    run: "less README.md"
+windows:
+  - name: "workspace"
+    layout: "ops"
+    panes:
+      - role: "editor"
+        command: "${EDITOR:-nvim} ."
+      - role: "shell"
+      - role: "tests"
+        command_ref: "tests"
+      - role: "docs"
+        command_ref: "docs"
