@@ -1,12 +1,18 @@
-.PHONY: format format-check test build
+.PHONY: bootstrap format format-check test build
+
+RUFF := ./scripts/ruffw
+
+bootstrap:
+	npm install
+	$(RUFF) --version
 
 format:
 	go fmt ./...
-	ruff format .
+	$(RUFF) format .
 	npm exec -- biome format --write .
 
 format-check:
-	ruff format --check .
+	$(RUFF) format --check .
 	npm exec -- biome check .
 
 test:

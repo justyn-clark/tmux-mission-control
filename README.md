@@ -16,6 +16,7 @@ It gives a project one human-readable YAML manifest and turns that manifest into
 - Go 1.25 or newer to build `tmc`
 - `tmux` 3.x or newer at runtime
 - A POSIX shell such as `zsh`, `bash`, or `sh`
+- Python 3 when running development formatting targets, so the repo can bootstrap its pinned local `ruff`
 
 ## Install
 
@@ -25,17 +26,17 @@ go build -o ./bin/tmc ./cmd/tmc
 
 ## Development
 
-Formatting is explicit and checked before publish:
+Bootstrap the local toolchain once, then run the standard checks:
 
 ```bash
-npm install
+make bootstrap
 make format
 make format-check
 go test ./...
 ```
 
 - Go code uses `gofmt`
-- Python utilities use `ruff format`
+- Python formatting uses a repo-local, pinned `ruff` bootstrap via `./scripts/ruffw`
 - JSON or future JS or TS repo assets use `Biome`
 
 ## Quick Start
