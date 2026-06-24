@@ -16,7 +16,7 @@ It gives a project one human-readable YAML manifest and turns that manifest into
 - Go 1.25 or newer to build `tmc`
 - `tmux` 3.x or newer at runtime
 - A POSIX shell such as `zsh`, `bash`, or `sh`
-- Python 3 when running development formatting targets, so the repo can bootstrap its pinned local `ruff`
+- Node.js and npm when running Biome-based repository checks
 
 ## Install
 
@@ -36,8 +36,8 @@ go test ./...
 ```
 
 - Go code uses `gofmt`
-- Python formatting uses a repo-local, pinned `ruff` bootstrap via `./scripts/ruffw`
 - JSON or future JS or TS repo assets use `Biome`
+- `make bootstrap` installs npm dependencies from `package-lock.json` and may need registry access on a fresh machine; `make format-check` uses the repo-local Biome binary and does not install tools
 
 ## Quick Start
 
@@ -80,15 +80,23 @@ Inspect or tear down the session:
 ./bin/tmc stop --session my-session
 ```
 
+Machine-readable output is available for automation:
+
+```bash
+./bin/tmc dry-run --file project.yml --json
+./bin/tmc list --managed --json
+./bin/tmc status --session my-session --json
+```
+
 ## Commands
 
 - `tmc init`
 - `tmc start --file project.yml [--detach]`
 - `tmc stop --session NAME`
-- `tmc list`
-- `tmc status --session NAME`
+- `tmc list [--managed] [--json]`
+- `tmc status --session NAME [--json]`
 - `tmc doctor [--file project.yml]`
-- `tmc dry-run --file project.yml [--detach]`
+- `tmc dry-run --file project.yml [--detach] [--json]`
 - `tmc completion [bash|zsh|fish]`
 
 ## Manifest Example
@@ -143,9 +151,11 @@ See [docs/layouts.md](docs/layouts.md) for pane-role ordering and ASCII diagrams
 - [docs/layouts.md](docs/layouts.md)
 - [docs/doctor.md](docs/doctor.md)
 - [docs/examples.md](docs/examples.md)
+- [docs/STATUS.md](docs/STATUS.md)
 
 ## Notes
 
 - `tmux` is a hard dependency. There is no GUI path.
+- `tmc` is a workspace launcher, not a process supervisor, health monitor, deployment system, remote session manager, or restart daemon.
 - Pane exit codes are tracked in the local user cache directory so `tmc status` can report the last known command exit when a pane command returns.
 - `tmc stop` loads shutdown hooks from the manifest path recorded on session creation.

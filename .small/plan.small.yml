@@ -28,3 +28,16 @@ tasks:
       - "Repository includes README plus docs/manifest-spec.md, docs/layouts.md, docs/doctor.md, and docs/examples.md."
       - "go test ./... passes."
       - "tmc doctor, dry-run, start, status, and stop have been exercised locally."
+  - id: "task-4"
+    title: "Repair state contract and harden operator workflows"
+    steps:
+      - "Fill in the SMALL project intent, fix strict-mode state drift, and document current status."
+      - "Remove unused network-dependent verification from the default checks."
+      - "Add JSON output and managed filtering for operator-facing commands."
+      - "Preflight tmux lifecycle assumptions and fail clearly on missing shutdown-hook manifests."
+      - "Add isolated tmux integration tests for the lifecycle."
+    acceptance:
+      - "small check --strict passes."
+      - "make format-check passes without network access."
+      - "go test ./... passes, including isolated tmux integration coverage."
+      - "README and docs/STATUS.md state current product boundaries, limits, and roadmap."

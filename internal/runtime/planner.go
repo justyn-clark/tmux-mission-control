@@ -17,15 +17,16 @@ type StartOptions struct {
 type Planner struct{}
 
 type Plan struct {
-	SessionName string
-	Detach      bool
-	Actions     []Action
+	SessionName string   `json:"session"`
+	Detach      bool     `json:"detach"`
+	Actions     []Action `json:"actions"`
 }
 
 type Action struct {
-	Kind    string
-	Command []string
-	Note    string
+	Kind    string   `json:"kind"`
+	Command []string `json:"command"`
+	Note    string   `json:"note,omitempty"`
+	CWD     string   `json:"cwd,omitempty"`
 }
 
 type PanePlan struct {
@@ -98,6 +99,7 @@ func (p *Planner) Plan(m *manifest.Manifest, opts StartOptions) (*Plan, error) {
 						Kind:    "new-session",
 						Command: []string{"tmux", "new-session", "-d", "-s", m.Session, "-n", window.Name, "-c", paneCWD, paneShellCommand(m.Shell)},
 						Note:    fmt.Sprintf("create session %s and window %s", m.Session, window.Name),
+						CWD:     paneCWD,
 					},
 					setOptionAction(m.Session, "base-index", "0", "normalize window indexing for the session"),
 					setOptionAction(m.Session, "pane-base-index", "0", "normalize pane indexing for the session"),
@@ -111,6 +113,7 @@ func (p *Planner) Plan(m *manifest.Manifest, opts StartOptions) (*Plan, error) {
 					Kind:    "new-window",
 					Command: []string{"tmux", "new-window", "-d", "-t", m.Session, "-n", window.Name, "-c", paneCWD, paneShellCommand(m.Shell)},
 					Note:    fmt.Sprintf("create window %s", window.Name),
+					CWD:     paneCWD,
 				})
 			} else {
 				args := []string{"tmux", "split-window", "-d", "-t", fmt.Sprintf("%s.%d", targetWindow, pane.SplitFrom)}
@@ -127,6 +130,7 @@ func (p *Planner) Plan(m *manifest.Manifest, opts StartOptions) (*Plan, error) {
 					Kind:    "split-window",
 					Command: args,
 					Note:    fmt.Sprintf("create %s pane in window %s", pane.Pane.Role, window.Name),
+					CWD:     paneCWD,
 				})
 			}
 
@@ -151,6 +155,7 @@ func (p *Planner) Plan(m *manifest.Manifest, opts StartOptions) (*Plan, error) {
 					Kind:    "send-keys",
 					Command: []string{"tmux", "send-keys", "-t", targetPane, setupCommand, "C-m"},
 					Note:    fmt.Sprintf("dispatch command for %s", targetPane),
+					CWD:     paneCWD,
 				})
 			}
 		}
@@ -238,6 +243,7 @@ func shellAction(kind, command, cwd string, env map[string]string, note string) 
 		Kind:    kind,
 		Command: []string{"/bin/sh", "-lc", buildShellCommand(cwd, env, command)},
 		Note:    note,
+		CWD:     cwd,
 	}
 }
 

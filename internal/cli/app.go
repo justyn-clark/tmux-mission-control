@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -22,10 +23,10 @@ Usage:
   tmc init [--output project.yml] [--name NAME] [--root PATH] [--layout LAYOUT]
   tmc start --file project.yml [--detach]
   tmc stop --session NAME
-  tmc list
-  tmc status --session NAME
+  tmc list [--managed] [--json]
+  tmc status --session NAME [--json]
   tmc doctor [--file project.yml]
-  tmc dry-run --file project.yml [--detach]
+  tmc dry-run --file project.yml [--detach] [--json]
   tmc completion [bash|zsh|fish]
 
 Layouts:
@@ -140,6 +141,7 @@ func runDryRun(args []string, stdout io.Writer) error {
 
 	file := fs.String("file", "", "manifest path")
 	detach := fs.Bool("detach", false, "create session without attaching")
+	jsonOutput := fs.Bool("json", false, "emit JSON")
 
 	if err := fs.Parse(args); err != nil {
 		return err
@@ -159,6 +161,9 @@ func runDryRun(args []string, stdout io.Writer) error {
 		return err
 	}
 
+	if *jsonOutput {
+		return writeJSON(stdout, plan)
+	}
 	for _, line := range plan.Describe() {
 		if _, err := fmt.Fprintln(stdout, line); err != nil {
 			return err
@@ -193,6 +198,9 @@ func runList(args []string, stdout io.Writer) error {
 	fs := flag.NewFlagSet("list", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 
+	managedOnly := fs.Bool("managed", false, "show only tmc-managed sessions")
+	jsonOutput := fs.Bool("json", false, "emit JSON")
+
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -200,7 +208,26 @@ func runList(args []string, stdout io.Writer) error {
 	client := tmux.NewClient()
 	sessions, err := client.ListSessions()
 	if err != nil {
+		if tmux.IsTmuxNotRunning(err) {
+			if *jsonOutput {
+				return writeJSON(stdout, []tmux.SessionSummary{})
+			}
+			_, writeErr := fmt.Fprintln(stdout, "tmux server is not running")
+			return writeErr
+		}
 		return err
+	}
+	if *managedOnly {
+		filtered := sessions[:0]
+		for _, session := range sessions {
+			if session.Managed {
+				filtered = append(filtered, session)
+			}
+		}
+		sessions = filtered
+	}
+	if *jsonOutput {
+		return writeJSON(stdout, sessions)
 	}
 	if len(sessions) == 0 {
 		_, err := fmt.Fprintln(stdout, "no tmux sessions")
@@ -227,6 +254,7 @@ func runStatus(args []string, stdout io.Writer) error {
 	fs.SetOutput(io.Discard)
 
 	session := fs.String("session", "", "session name")
+	jsonOutput := fs.Bool("json", false, "emit JSON")
 
 	if err := fs.Parse(args); err != nil {
 		return err
@@ -241,7 +269,19 @@ func runStatus(args []string, stdout io.Writer) error {
 		return err
 	}
 
-	if _, err := fmt.Fprintf(stdout, "session: %s\nexists: %t\nwindows: %d\n", report.Session, report.Exists, report.WindowCount); err != nil {
+	if *jsonOutput {
+		return writeJSON(stdout, report)
+	}
+
+	if _, err := fmt.Fprintf(stdout, "session: %s\ntmux_running: %t\nexists: %t\nmanaged: %t\nproject: %s\nmanifest: %s\nwindows: %d\n",
+		report.Session,
+		report.TmuxRunning,
+		report.Exists,
+		report.Managed,
+		report.Project,
+		report.ManifestPath,
+		report.WindowCount,
+	); err != nil {
 		return err
 	}
 	if len(report.Panes) == 0 {
@@ -269,6 +309,12 @@ func runStatus(args []string, stdout io.Writer) error {
 		}
 	}
 	return nil
+}
+
+func writeJSON(stdout io.Writer, value any) error {
+	encoder := json.NewEncoder(stdout)
+	encoder.SetIndent("", "  ")
+	return encoder.Encode(value)
 }
 
 func runDoctor(args []string, stdout io.Writer) error {

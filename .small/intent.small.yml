@@ -1,7 +1,25 @@
 small_version: "1.0.0"
 owner: "human"
-intent: "Define project intent"
+intent: "Build tmux-mission-control as a local, manifest-driven tmux workspace launcher for repeatable project, service, log, and agent-loop sessions."
 scope:
-  include: []
-  exclude: []
-success_criteria: []
+  include:
+    - "A versioned YAML manifest contract for projects, commands, hooks, windows, panes, roles, and preset layouts."
+    - "A Go CLI named tmc with init, dry-run, doctor, start, stop, list, status, and completion commands."
+    - "Deterministic tmux planning that can be reviewed before mutation."
+    - "Runtime metadata that makes managed sessions inspectable and stoppable without chat-only context."
+    - "Operator documentation covering usage, boundaries, current limits, and roadmap."
+  exclude:
+    - "Long-running process supervision or automatic restart management."
+    - "Production deployment orchestration."
+    - "Remote session management."
+    - "GUI or web control surfaces."
+    - "Custom user-defined layout engines before preset layouts are proven."
+success_criteria:
+  - "go test ./... passes."
+  - "make format-check passes without network access."
+  - "small check --strict passes."
+  - "tmc dry-run can print human-readable and JSON plans without mutating tmux state."
+  - "tmc status and tmc list can print human-readable and JSON reports and distinguish missing sessions from tmux access failures."
+  - "tmc start performs preflight checks before mutating tmux and handles failed starts without silently leaving ambiguous state."
+  - "tmc stop fails clearly when required shutdown-hook manifest metadata is missing or unreadable."
+  - "Automated integration coverage exercises tmc against an isolated tmux socket."

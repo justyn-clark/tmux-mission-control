@@ -12,10 +12,16 @@ entries:
       notes: Verified packages under cmd/, internal/, docs/, and examples/ with go test and a successful binary build.
       status: completed
       task_id: task-2
-      timestamp: "2026-04-16T05:17:36Z"
+      timestamp: "2026-04-16T05:17:36.000000000Z"
     - command: ./bin/tmc doctor --file \"$tmpdir/project.yml\" && ./bin/tmc dry-run --file \"$tmpdir/project.yml\" && ./bin/tmc start --file \"$tmpdir/project.yml\" && ./bin/tmc status --session tmc-smoke && ./bin/tmc stop --session tmc-smoke
       evidence: Ran end-to-end smoke tests against a temporary manifest and confirmed doctor, dry-run, detached start, status, exit tracking, and stop behavior on a live tmux server.
       notes: Also validated tmc init with a root path containing spaces and confirmed the generated manifest passed doctor and dry-run.
       status: completed
       task_id: task-3
-      timestamp: "2026-04-16T05:17:36Z"
+      timestamp: "2026-04-16T05:17:36.000000001Z"
+    - command: go test -count=1 ./... && make format-check && small check --strict
+      evidence: Repaired the SMALL state contract, added docs/STATUS.md, removed unused Ruff/Python verification, added JSON output and managed filtering, hardened tmux lifecycle preflight/stop behavior, and added isolated tmux integration tests. Non-cached Go tests, deterministic format-check, and strict SMALL validation passed.
+      notes: Additional CLI smoke confirmed dry-run --json output and status --json reports tmux_running=false for a missing isolated tmux socket.
+      status: completed
+      task_id: task-4
+      timestamp: "2026-06-24T18:34:37.000000000Z"

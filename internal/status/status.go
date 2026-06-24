@@ -9,31 +9,46 @@ import (
 )
 
 type Report struct {
-	Session     string
-	Exists      bool
-	WindowCount int
-	Panes       []PaneStatus
+	Session      string       `json:"session"`
+	TmuxRunning  bool         `json:"tmux_running"`
+	Exists       bool         `json:"exists"`
+	Managed      bool         `json:"managed"`
+	Project      string       `json:"project,omitempty"`
+	ManifestPath string       `json:"manifest_path,omitempty"`
+	WindowCount  int          `json:"windows"`
+	Panes        []PaneStatus `json:"panes,omitempty"`
 }
 
 type PaneStatus struct {
-	PaneID   string
-	Window   string
-	Role     string
-	Command  string
-	CWD      string
-	Dead     bool
-	LastExit *int
+	PaneID   string `json:"pane_id"`
+	Window   string `json:"window"`
+	Role     string `json:"role"`
+	Command  string `json:"command"`
+	CWD      string `json:"cwd"`
+	Dead     bool   `json:"dead"`
+	LastExit *int   `json:"last_exit,omitempty"`
 }
 
 func Collect(client *tmux.Client, session string) (*Report, error) {
 	exists, err := client.SessionExists(session)
 	if err != nil {
+		if tmux.IsTmuxNotRunning(err) {
+			return &Report{Session: session, TmuxRunning: false, Exists: false}, nil
+		}
 		return nil, err
 	}
-	report := &Report{Session: session, Exists: exists}
+	report := &Report{Session: session, TmuxRunning: true, Exists: exists}
 	if !exists {
 		return report, nil
 	}
+
+	metadata, err := client.SessionMetadata(session)
+	if err != nil {
+		return nil, err
+	}
+	report.Managed = metadata.Managed
+	report.Project = metadata.Project
+	report.ManifestPath = metadata.ManifestPath
 
 	windowCount, err := client.WindowCount(session)
 	if err != nil {

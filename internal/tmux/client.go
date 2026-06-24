@@ -3,6 +3,7 @@ package tmux
 import (
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"sort"
 	"strconv"
@@ -14,11 +15,24 @@ import (
 
 type Client struct{}
 
+var (
+	ErrTmuxNotRunning   = errors.New("tmux server is not running")
+	ErrTmuxInaccessible = errors.New("tmux socket is inaccessible")
+)
+
 type SessionSummary struct {
-	Name     string
-	Windows  int
-	Attached int
-	Managed  bool
+	Name         string `json:"name"`
+	Windows      int    `json:"windows"`
+	Attached     int    `json:"attached"`
+	Managed      bool   `json:"managed"`
+	Project      string `json:"project,omitempty"`
+	ManifestPath string `json:"manifest_path,omitempty"`
+}
+
+type SessionMetadata struct {
+	Managed      bool
+	Project      string
+	ManifestPath string
 }
 
 type PaneRecord struct {
@@ -38,21 +52,68 @@ func NewClient() *Client {
 }
 
 func (c *Client) Apply(plan *runtime.Plan) error {
+	if err := c.Preflight(plan); err != nil {
+		return err
+	}
+	sessionCreated := false
+	for _, action := range plan.Actions {
+		runAction := func() error {
+			switch action.Kind {
+			case "check-session":
+				return nil
+			case "startup-hook", "window-startup-hook":
+				if err := run(action.Command); err != nil {
+					return fmt.Errorf("%s failed: %w", action.Note, err)
+				}
+				return nil
+			default:
+				if err := run(action.Command); err != nil {
+					return fmt.Errorf("%s: %w", action.Note, err)
+				}
+				return nil
+			}
+		}
+
+		if err := runAction(); err != nil {
+			if sessionCreated {
+				_ = run([]string{"tmux", "kill-session", "-t", plan.SessionName})
+			}
+			return err
+		}
+		if action.Kind == "new-session" {
+			sessionCreated = true
+		}
+	}
+	return nil
+}
+
+func (c *Client) Preflight(plan *runtime.Plan) error {
+	if plan == nil {
+		return errors.New("tmux plan is nil")
+	}
+	if plan.SessionName == "" {
+		return errors.New("tmux plan session name is empty")
+	}
+	if _, err := exec.LookPath(tmuxBinary()); err != nil {
+		return fmt.Errorf("tmux binary unavailable: %w", err)
+	}
+	if err := c.ensureSessionMissing(plan.SessionName); err != nil {
+		return err
+	}
 	for _, action := range plan.Actions {
 		switch action.Kind {
 		case "check-session":
-			if err := c.ensureSessionMissing(plan.SessionName); err != nil {
-				return err
-			}
 			continue
-		case "startup-hook", "window-startup-hook":
-			if err := run(action.Command); err != nil {
-				return fmt.Errorf("%s failed: %w", action.Note, err)
+		case "startup-hook", "window-startup-hook", "new-session", "new-window", "split-window", "send-keys":
+			if strings.TrimSpace(action.CWD) == "" {
+				return fmt.Errorf("%s preflight failed: cwd is empty", action.Note)
 			}
-			continue
-		default:
-			if err := run(action.Command); err != nil {
-				return fmt.Errorf("%s: %w", action.Note, err)
+			info, err := os.Stat(action.CWD)
+			if err != nil {
+				return fmt.Errorf("%s preflight failed: %w", action.Note, err)
+			}
+			if !info.IsDir() {
+				return fmt.Errorf("%s preflight failed: cwd is not a directory: %s", action.Note, action.CWD)
 			}
 		}
 	}
@@ -60,41 +121,50 @@ func (c *Client) Apply(plan *runtime.Plan) error {
 }
 
 func (c *Client) StopSession(session string) error {
-	var hookErr error
+	managedValue, managedErr := c.sessionOption(session, "@tmc_managed")
+	if managedErr != nil && IsTmuxInaccessible(managedErr) {
+		return managedErr
+	}
+
 	manifestPath, _ := c.sessionOption(session, "@tmc_manifest")
-	if manifestPath != "" {
+	if managedValue == "1" {
+		if strings.TrimSpace(manifestPath) == "" {
+			return fmt.Errorf("managed session %q is missing @tmc_manifest metadata; refusing to stop because shutdown hooks cannot be audited", session)
+		}
 		m, err := manifest.LoadFile(manifestPath)
-		if err == nil {
-			for i := len(m.Windows) - 1; i >= 0; i-- {
-				window := m.Windows[i]
-				for j := len(window.ShutdownHooks) - 1; j >= 0; j-- {
-					hook := window.ShutdownHooks[j]
-					if err := runHook(firstNonEmpty(hook.CWD, window.Root), mergeEnv(m.Env, window.Env, hook.Env), hook.Command); err != nil && hookErr == nil {
-						hookErr = fmt.Errorf("window shutdown hook %s: %w", window.Name, err)
-					}
+		if err != nil {
+			return fmt.Errorf("managed session %q recorded unreadable shutdown hook manifest %q: %w", session, manifestPath, err)
+		}
+		for i := len(m.Windows) - 1; i >= 0; i-- {
+			window := m.Windows[i]
+			for j := len(window.ShutdownHooks) - 1; j >= 0; j-- {
+				hook := window.ShutdownHooks[j]
+				if err := runHook(firstNonEmpty(hook.CWD, window.Root), mergeEnv(m.Env, window.Env, hook.Env), hook.Command); err != nil {
+					return fmt.Errorf("window shutdown hook %s: %w", window.Name, err)
 				}
 			}
-			for i := len(m.ShutdownHooks) - 1; i >= 0; i-- {
-				hook := m.ShutdownHooks[i]
-				if err := runHook(firstNonEmpty(hook.CWD, m.Root), mergeEnv(m.Env, hook.Env), hook.Command); err != nil && hookErr == nil {
-					hookErr = fmt.Errorf("project shutdown hook: %w", err)
-				}
+		}
+		for i := len(m.ShutdownHooks) - 1; i >= 0; i-- {
+			hook := m.ShutdownHooks[i]
+			if err := runHook(firstNonEmpty(hook.CWD, m.Root), mergeEnv(m.Env, hook.Env), hook.Command); err != nil {
+				return fmt.Errorf("project shutdown hook: %w", err)
 			}
 		}
 	}
 	if err := run([]string{"tmux", "kill-session", "-t", session}); err != nil {
 		return err
 	}
-	return hookErr
+	return nil
 }
 
 func (c *Client) ListSessions() ([]SessionSummary, error) {
 	output, err := runOutput([]string{"tmux", "list-sessions", "-F", "#{session_name}\t#{session_windows}\t#{session_attached}"})
 	if err != nil {
-		if strings.Contains(err.Error(), "failed to connect") {
-			return nil, nil
+		classified := classifyTmuxError(err)
+		if errors.Is(classified, ErrTmuxNotRunning) {
+			return nil, classified
 		}
-		return nil, err
+		return nil, classified
 	}
 	lines := strings.Split(strings.TrimSpace(output), "\n")
 	sessions := make([]SessionSummary, 0, len(lines))
@@ -108,12 +178,14 @@ func (c *Client) ListSessions() ([]SessionSummary, error) {
 		}
 		windows, _ := strconv.Atoi(parts[1])
 		attached, _ := strconv.Atoi(parts[2])
-		managed, _ := c.sessionOption(parts[0], "@tmc_managed")
+		metadata, _ := c.SessionMetadata(parts[0])
 		sessions = append(sessions, SessionSummary{
-			Name:     parts[0],
-			Windows:  windows,
-			Attached: attached,
-			Managed:  managed == "1",
+			Name:         parts[0],
+			Windows:      windows,
+			Attached:     attached,
+			Managed:      metadata.Managed,
+			Project:      metadata.Project,
+			ManifestPath: metadata.ManifestPath,
 		})
 	}
 	return sessions, nil
@@ -124,10 +196,11 @@ func (c *Client) SessionExists(session string) (bool, error) {
 	if err == nil {
 		return true, nil
 	}
-	if strings.Contains(err.Error(), "can't find session") || strings.Contains(err.Error(), "failed to connect") {
+	if strings.Contains(err.Error(), "can't find session") {
 		return false, nil
 	}
-	return false, err
+	classified := classifyTmuxError(err)
+	return false, classified
 }
 
 func (c *Client) WindowCount(session string) (int, error) {
@@ -176,8 +249,29 @@ func (c *Client) ListPanes(session string) ([]PaneRecord, error) {
 	return panes, nil
 }
 
+func (c *Client) SessionMetadata(session string) (SessionMetadata, error) {
+	managed, err := c.sessionOption(session, "@tmc_managed")
+	if err != nil {
+		classified := classifyTmuxError(err)
+		if errors.Is(classified, ErrTmuxInaccessible) {
+			return SessionMetadata{}, classified
+		}
+	}
+	project, _ := c.sessionOption(session, "@tmc_project")
+	manifestPath, _ := c.sessionOption(session, "@tmc_manifest")
+	return SessionMetadata{
+		Managed:      managed == "1",
+		Project:      project,
+		ManifestPath: manifestPath,
+	}, nil
+}
+
 func (c *Client) sessionOption(session, option string) (string, error) {
-	return runOutput([]string{"tmux", "show-options", "-v", "-t", session, option})
+	output, err := runOutput([]string{"tmux", "show-options", "-v", "-t", session, option})
+	if err != nil {
+		return "", classifyTmuxError(err)
+	}
+	return output, nil
 }
 
 func (c *Client) paneOption(paneID, option string) (string, error) {
@@ -187,6 +281,9 @@ func (c *Client) paneOption(paneID, option string) (string, error) {
 func (c *Client) ensureSessionMissing(session string) error {
 	exists, err := c.SessionExists(session)
 	if err != nil {
+		if IsTmuxNotRunning(err) {
+			return nil
+		}
 		return err
 	}
 	if exists {
@@ -196,7 +293,8 @@ func (c *Client) ensureSessionMissing(session string) error {
 }
 
 func run(args []string) error {
-	cmd := exec.Command(args[0], args[1:]...)
+	name, commandArgs := commandArgs(args)
+	cmd := exec.Command(name, commandArgs...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		text := strings.TrimSpace(string(output))
@@ -209,7 +307,8 @@ func run(args []string) error {
 }
 
 func runOutput(args []string) (string, error) {
-	cmd := exec.Command(args[0], args[1:]...)
+	name, commandArgs := commandArgs(args)
+	cmd := exec.Command(name, commandArgs...)
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		text := strings.TrimSpace(string(output))
@@ -219,6 +318,50 @@ func runOutput(args []string) (string, error) {
 		return "", errors.New(text)
 	}
 	return strings.TrimSpace(string(output)), nil
+}
+
+func commandArgs(args []string) (string, []string) {
+	if len(args) == 0 {
+		return "", nil
+	}
+	if args[0] != "tmux" {
+		return args[0], args[1:]
+	}
+	command := append([]string{}, args[1:]...)
+	if socket := os.Getenv("TMC_TMUX_SOCKET"); strings.TrimSpace(socket) != "" {
+		command = append([]string{"-S", socket}, command...)
+	}
+	return tmuxBinary(), command
+}
+
+func tmuxBinary() string {
+	if value := os.Getenv("TMC_TMUX_BIN"); strings.TrimSpace(value) != "" {
+		return value
+	}
+	return "tmux"
+}
+
+func classifyTmuxError(err error) error {
+	if err == nil {
+		return nil
+	}
+	message := err.Error()
+	switch {
+	case strings.Contains(message, "failed to connect"), strings.Contains(message, "No such file or directory"), strings.Contains(message, "no server running"):
+		return fmt.Errorf("%w: %s", ErrTmuxNotRunning, message)
+	case strings.Contains(message, "Operation not permitted"), strings.Contains(strings.ToLower(message), "permission denied"):
+		return fmt.Errorf("%w: %s", ErrTmuxInaccessible, message)
+	default:
+		return err
+	}
+}
+
+func IsTmuxNotRunning(err error) bool {
+	return errors.Is(err, ErrTmuxNotRunning)
+}
+
+func IsTmuxInaccessible(err error) bool {
+	return errors.Is(err, ErrTmuxInaccessible)
 }
 
 func runHook(cwd string, env map[string]string, command string) error {

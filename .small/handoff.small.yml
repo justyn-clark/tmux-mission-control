@@ -1,11 +1,11 @@
 small_version: "1.0.0"
 owner: agent
-summary: Runnable tmux-mission-control CLI implemented in Go with manifest-driven session bootstrap, layouts, doctor/status, examples, docs, and verification coverage.
+summary: Runnable tmux-mission-control CLI implemented in Go with manifest-driven session bootstrap, preset layouts, doctor/status, examples, docs, deterministic checks, JSON operator output, lifecycle preflight hardening, and isolated tmux integration coverage.
 resume:
-    current_task_id: task-3
+    current_task_id: task-4
     next_steps:
-        - Review the implementation and example manifests for any naming or workflow adjustments before committing.
-        - If desired, add richer tmux metadata or additional custom layout support on top of the current preset model.
+        - Review the hardening diff and commit when ready.
+        - Consider follow-up tests for multi-window sessions and hook failure variants.
 links: []
 replayId:
     value: 840085fc39934e12924d1cfa912a7b1dd3fcd255658447526d651d06347146db
