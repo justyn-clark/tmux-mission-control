@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/justynclarknetwork/tmux-mission-control/internal/manifest"
+	"github.com/justyn-clark/tmux-mission-control/internal/manifest"
 )
 
 type StartOptions struct {

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="654" viewBox="0 0 980 654" role="img" aria-label="tmc JSON output terminal screenshot">
+  <rect width="100%" height="100%" rx="12" fill="#0b1020"/>
+  <rect x="0" y="0" width="100%" height="38" rx="12" fill="#111827"/>
+  <circle cx="24" cy="19" r="6" fill="#ff5f57"/>
+  <circle cx="44" cy="19" r="6" fill="#ffbd2e"/>
+  <circle cx="64" cy="19" r="6" fill="#28c840"/>
+  <text x="490" y="24" text-anchor="middle" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">tmc JSON output</text>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14">
+<text x="28" y="66" fill="#a7f3d0">$ tmc dry-run --file project.yml --json</text>
+<text x="28" y="84" fill="#d6deeb"></text>
+<text x="28" y="102" fill="#d6deeb">{</text>
+<text x="28" y="120" fill="#d6deeb">  &quot;session&quot;: &quot;mission-control-demo&quot;,</text>
+<text x="28" y="138" fill="#d6deeb">  &quot;detach&quot;: false,</text>
+<text x="28" y="156" fill="#d6deeb">  &quot;actions&quot;: [</text>
+<text x="28" y="174" fill="#d6deeb">    {</text>
+<text x="28" y="192" fill="#d6deeb">      &quot;kind&quot;: &quot;check-session&quot;,</text>
+<text x="28" y="210" fill="#d6deeb">      &quot;command&quot;: [</text>
+<text x="28" y="228" fill="#d6deeb">        &quot;tmux&quot;,</text>
+<text x="28" y="246" fill="#d6deeb">        &quot;has-session&quot;,</text>
+<text x="28" y="264" fill="#d6deeb">        &quot;-t&quot;,</text>
+<text x="28" y="282" fill="#d6deeb">        &quot;mission-control-demo&quot;</text>
+<text x="28" y="300" fill="#d6deeb">      ],</text>
+<text x="28" y="318" fill="#d6deeb">      &quot;note&quot;: &quot;verify the target session does not already exist&quot;</text>
+<text x="28" y="336" fill="#d6deeb">    },</text>
+<text x="28" y="354" fill="#d6deeb">    {</text>
+<text x="28" y="372" fill="#d6deeb">      &quot;kind&quot;: &quot;new-session&quot;,</text>
+<text x="28" y="390" fill="#d6deeb">      &quot;command&quot;: [</text>
+<text x="28" y="408" fill="#d6deeb">        &quot;tmux&quot;,</text>
+<text x="28" y="426" fill="#d6deeb">        &quot;new-session&quot;,</text>
+<text x="28" y="444" fill="#d6deeb">        &quot;-d&quot;,</text>
+<text x="28" y="462" fill="#d6deeb">        &quot;-s&quot;,</text>
+<text x="28" y="480" fill="#d6deeb">        &quot;mission-control-demo&quot;,</text>
+<text x="28" y="498" fill="#d6deeb">        &quot;-n&quot;,</text>
+<text x="28" y="516" fill="#d6deeb">        &quot;workspace&quot;,</text>
+<text x="28" y="534" fill="#d6deeb">        &quot;-c&quot;,</text>
+<text x="28" y="552" fill="#d6deeb">        &quot;/Users/you/projects/mission-control-demo&quot;,</text>
+<text x="28" y="570" fill="#d6deeb">        &quot;exec '/bin/zsh' -i&quot;</text>
+<text x="28" y="588" fill="#d6deeb">      ],</text>
+<text x="28" y="606" fill="#d6deeb">      &quot;note&quot;: &quot;create session mission-control-demo and window workspace&quot;,</text>
+<text x="28" y="624" fill="#d6deeb">      &quot;cwd&quot;: &quot;/Users/you/projects/mission-control-demo&quot;</text>
+  </g>
+</svg>

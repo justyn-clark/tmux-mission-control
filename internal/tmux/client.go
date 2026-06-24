@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/justynclarknetwork/tmux-mission-control/internal/manifest"
-	"github.com/justynclarknetwork/tmux-mission-control/internal/runtime"
+	"github.com/justyn-clark/tmux-mission-control/internal/manifest"
+	"github.com/justyn-clark/tmux-mission-control/internal/runtime"
 )
 
 type Client struct{}

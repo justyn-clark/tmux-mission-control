@@ -41,3 +41,17 @@ tasks:
       - "make format-check passes without network access."
       - "go test ./... passes, including isolated tmux integration coverage."
       - "README and docs/STATUS.md state current product boundaries, limits, and roadmap."
+  - id: "task-5"
+    title: "Prepare personal-account distribution"
+    steps:
+      - "Align Go module and repository docs with github.com/justyn-clark/tmux-mission-control."
+      - "Add version metadata and release artifact build plumbing."
+      - "Add GitHub release workflow for tagged macOS and Linux binaries."
+      - "Generate terminal screenshot assets from actual CLI output."
+      - "Document installation paths, distribution model, and product value."
+    acceptance:
+      - "go test -count=1 ./... passes."
+      - "make format-check passes."
+      - "small check --strict passes."
+      - "scripts/build-release.sh builds release archives and SHA256SUMS."
+      - "README and docs explain go install, GitHub Releases, Homebrew path, screenshots, and value."

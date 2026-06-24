@@ -21,6 +21,15 @@ The repository ships five example manifests in [`examples/`](../examples).
 
 If you are starting from scratch instead of copying an example, use `tmc init --layout <layout>` first, then edit the generated manifest.
 
+Before running an example in a real workspace, use:
+
+```bash
+tmc doctor --file <example>
+tmc dry-run --file <example>
+```
+
+Use `--json` with `dry-run`, `list`, or `status` when another tool or agent needs structured output.
+
 ## Example Patterns
 
 - Go service: editor, shell, server, logs

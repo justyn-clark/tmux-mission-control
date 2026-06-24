@@ -10,11 +10,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/justynclarknetwork/tmux-mission-control/internal/doctor"
-	"github.com/justynclarknetwork/tmux-mission-control/internal/manifest"
-	"github.com/justynclarknetwork/tmux-mission-control/internal/runtime"
-	"github.com/justynclarknetwork/tmux-mission-control/internal/status"
-	"github.com/justynclarknetwork/tmux-mission-control/internal/tmux"
+	"github.com/justyn-clark/tmux-mission-control/internal/doctor"
+	"github.com/justyn-clark/tmux-mission-control/internal/manifest"
+	"github.com/justyn-clark/tmux-mission-control/internal/runtime"
+	"github.com/justyn-clark/tmux-mission-control/internal/status"
+	"github.com/justyn-clark/tmux-mission-control/internal/tmux"
 )
 
 const usageText = `tmc: terminal-first tmux workspace launcher
@@ -28,10 +28,17 @@ Usage:
   tmc doctor [--file project.yml]
   tmc dry-run --file project.yml [--detach] [--json]
   tmc completion [bash|zsh|fish]
+  tmc version [--json]
 
 Layouts:
   dev, backend, frontend, ops, agent-lab
 `
+
+var (
+	Version = "dev"
+	Commit  = "unknown"
+	Date    = "unknown"
+)
 
 func Run(args []string, stdout, stderr io.Writer) error {
 	if len(args) == 0 {
@@ -56,6 +63,8 @@ func Run(args []string, stdout, stderr io.Writer) error {
 		return runDryRun(args[1:], stdout)
 	case "completion":
 		return runCompletion(args[1:], stdout)
+	case "version":
+		return runVersion(args[1:], stdout)
 	case "help", "-h", "--help":
 		_, err := fmt.Fprint(stdout, usageText)
 		return err
@@ -357,6 +366,28 @@ func runCompletion(args []string, stdout io.Writer) error {
 		return err
 	}
 	_, err = io.WriteString(stdout, script)
+	return err
+}
+
+func runVersion(args []string, stdout io.Writer) error {
+	fs := flag.NewFlagSet("version", flag.ContinueOnError)
+	fs.SetOutput(io.Discard)
+
+	jsonOutput := fs.Bool("json", false, "emit JSON")
+
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+
+	info := map[string]string{
+		"version": Version,
+		"commit":  Commit,
+		"date":    Date,
+	}
+	if *jsonOutput {
+		return writeJSON(stdout, info)
+	}
+	_, err := fmt.Fprintf(stdout, "tmc %s\ncommit: %s\nbuilt: %s\n", Version, Commit, Date)
 	return err
 }
 

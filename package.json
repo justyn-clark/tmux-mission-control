@@ -2,6 +2,10 @@
   "name": "tmux-mission-control",
   "private": true,
   "description": "Terminal-first tmux workspace launcher tooling",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/justyn-clark/tmux-mission-control.git"
+  },
   "scripts": {
     "format:js": "biome format --write .",
     "check:js": "biome check ."

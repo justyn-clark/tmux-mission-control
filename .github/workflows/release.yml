@@ -1,0 +1,58 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version label to build, for example v0.1.0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Verify
+        run: |
+          make format-check
+          go test -count=1 ./...
+
+      - name: Build release artifacts
+        run: scripts/build-release.sh "${VERSION}"
+        env:
+          VERSION: ${{ github.event.inputs.version || github.ref_name }}
+
+      - name: Publish GitHub release
+        run: |
+          if gh release view "${VERSION}" >/dev/null 2>&1; then
+            gh release upload "${VERSION}" dist/*.tar.gz dist/SHA256SUMS --clobber
+          else
+            gh release create "${VERSION}" dist/*.tar.gz dist/SHA256SUMS \
+              --title "${VERSION}" \
+              --notes "tmc release ${VERSION}"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ github.event.inputs.version || github.ref_name }}

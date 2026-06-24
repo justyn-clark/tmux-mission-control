@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="384" viewBox="0 0 980 384" role="img" aria-label="tmc --help terminal screenshot">
+  <rect width="100%" height="100%" rx="12" fill="#0b1020"/>
+  <rect x="0" y="0" width="100%" height="38" rx="12" fill="#111827"/>
+  <circle cx="24" cy="19" r="6" fill="#ff5f57"/>
+  <circle cx="44" cy="19" r="6" fill="#ffbd2e"/>
+  <circle cx="64" cy="19" r="6" fill="#28c840"/>
+  <text x="490" y="24" text-anchor="middle" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">tmc --help</text>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14">
+<text x="28" y="66" fill="#a7f3d0">$ tmc --help</text>
+<text x="28" y="84" fill="#d6deeb"></text>
+<text x="28" y="102" fill="#d6deeb">tmc: terminal-first tmux workspace launcher</text>
+<text x="28" y="120" fill="#d6deeb"></text>
+<text x="28" y="138" fill="#d6deeb">Usage:</text>
+<text x="28" y="156" fill="#d6deeb">  tmc init [--output project.yml] [--name NAME] [--root PATH] [--layout LAYOUT]</text>
+<text x="28" y="174" fill="#d6deeb">  tmc start --file project.yml [--detach]</text>
+<text x="28" y="192" fill="#d6deeb">  tmc stop --session NAME</text>
+<text x="28" y="210" fill="#d6deeb">  tmc list [--managed] [--json]</text>
+<text x="28" y="228" fill="#d6deeb">  tmc status --session NAME [--json]</text>
+<text x="28" y="246" fill="#d6deeb">  tmc doctor [--file project.yml]</text>
+<text x="28" y="264" fill="#d6deeb">  tmc dry-run --file project.yml [--detach] [--json]</text>
+<text x="28" y="282" fill="#d6deeb">  tmc completion [bash|zsh|fish]</text>
+<text x="28" y="300" fill="#d6deeb">  tmc version [--json]</text>
+<text x="28" y="318" fill="#d6deeb"></text>
+<text x="28" y="336" fill="#d6deeb">Layouts:</text>
+<text x="28" y="354" fill="#d6deeb">  dev, backend, frontend, ops, agent-lab</text>
+  </g>
+</svg>

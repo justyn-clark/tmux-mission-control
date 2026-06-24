@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/justynclarknetwork/tmux-mission-control/internal/runtime"
+	"github.com/justyn-clark/tmux-mission-control/internal/runtime"
 )
 
 func TestApplyCleansUpSessionAfterFailedMutation(t *testing.T) {

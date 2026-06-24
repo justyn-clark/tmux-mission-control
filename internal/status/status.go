@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/justynclarknetwork/tmux-mission-control/internal/tmux"
+	"github.com/justyn-clark/tmux-mission-control/internal/tmux"
 )
 
 type Report struct {

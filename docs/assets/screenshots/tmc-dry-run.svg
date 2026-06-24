@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="690" viewBox="0 0 980 690" role="img" aria-label="tmc dry-run terminal screenshot">
+  <rect width="100%" height="100%" rx="12" fill="#0b1020"/>
+  <rect x="0" y="0" width="100%" height="38" rx="12" fill="#111827"/>
+  <circle cx="24" cy="19" r="6" fill="#ff5f57"/>
+  <circle cx="44" cy="19" r="6" fill="#ffbd2e"/>
+  <circle cx="64" cy="19" r="6" fill="#28c840"/>
+  <text x="490" y="24" text-anchor="middle" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">tmc dry-run</text>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14">
+<text x="28" y="66" fill="#a7f3d0">$ tmc dry-run --file project.yml</text>
+<text x="28" y="84" fill="#d6deeb"></text>
+<text x="28" y="102" fill="#d6deeb">session: mission-control-demo</text>
+<text x="28" y="120" fill="#d6deeb">detach: false</text>
+<text x="28" y="138" fill="#d6deeb">actions:</text>
+<text x="28" y="156" fill="#d6deeb">01. 'tmux' 'has-session' '-t' 'mission-control-demo'</text>
+<text x="28" y="174" fill="#d6deeb">    verify the target session does not already exist</text>
+<text x="28" y="192" fill="#d6deeb">02. 'tmux' 'new-session' '-d' '-s' 'mission-control-demo' '-n' 'workspace' '-c' '/Users/you/projects/miss…</text>
+<text x="28" y="210" fill="#d6deeb">    create session mission-control-demo and window workspace</text>
+<text x="28" y="228" fill="#d6deeb">03. 'tmux' 'set-option' '-t' 'mission-control-demo' '-q' 'base-index' '0'</text>
+<text x="28" y="246" fill="#d6deeb">    normalize window indexing for the session</text>
+<text x="28" y="264" fill="#d6deeb">04. 'tmux' 'set-option' '-t' 'mission-control-demo' '-q' 'pane-base-index' '0'</text>
+<text x="28" y="282" fill="#d6deeb">    normalize pane indexing for the session</text>
+<text x="28" y="300" fill="#d6deeb">05. 'tmux' 'set-option' '-t' 'mission-control-demo' '-q' 'default-shell' '/bin/zsh'</text>
+<text x="28" y="318" fill="#d6deeb">    record the preferred shell for the session</text>
+<text x="28" y="336" fill="#d6deeb">06. 'tmux' 'set-option' '-t' 'mission-control-demo' '-q' '@tmc_managed' '1'</text>
+<text x="28" y="354" fill="#d6deeb">    mark session as managed</text>
+<text x="28" y="372" fill="#d6deeb">07. 'tmux' 'set-option' '-t' 'mission-control-demo' '-q' '@tmc_project' 'Mission Control Demo'</text>
+<text x="28" y="390" fill="#d6deeb">    record project name</text>
+<text x="28" y="408" fill="#d6deeb">08. 'tmux' 'set-option' '-t' 'mission-control-demo' '-q' '@tmc_manifest' 'project.yml'</text>
+<text x="28" y="426" fill="#d6deeb">    record manifest path</text>
+<text x="28" y="444" fill="#d6deeb">09. 'tmux' 'set-option' '-p' '-t' 'mission-control-demo:workspace.0' '-q' '@tmc_role' 'editor'</text>
+<text x="28" y="462" fill="#d6deeb">    record pane role</text>
+<text x="28" y="480" fill="#d6deeb">10. 'tmux' 'set-option' '-p' '-t' 'mission-control-demo:workspace.0' '-q' '@tmc_command' '${EDITOR:-nvim}…</text>
+<text x="28" y="498" fill="#d6deeb">    record pane command</text>
+<text x="28" y="516" fill="#d6deeb">11. 'tmux' 'set-option' '-p' '-t' 'mission-control-demo:workspace.0' '-q' '@tmc_cwd' '/Users/you/projects…</text>
+<text x="28" y="534" fill="#d6deeb">    record pane cwd</text>
+<text x="28" y="552" fill="#d6deeb">12. 'tmux' 'set-option' '-p' '-t' 'mission-control-demo:workspace.0' '-q' '@tmc_state_file' '/Users/you/L…</text>
+<text x="28" y="570" fill="#d6deeb">    record pane state file</text>
+<text x="28" y="588" fill="#d6deeb">13. 'tmux' 'select-pane' '-t' 'mission-control-demo:workspace.0' '-T' 'editor'</text>
+<text x="28" y="606" fill="#d6deeb">    set title for mission-control-demo:workspace.0</text>
+<text x="28" y="624" fill="#d6deeb">14. 'tmux' 'send-keys' '-t' 'mission-control-demo:workspace.0' 'mkdir -p '&quot;'&quot;'/Users/you/Library/Caches/t…</text>
+<text x="28" y="642" fill="#d6deeb">    dispatch command for mission-control-demo:workspace.0</text>
+<text x="28" y="660" fill="#d6deeb">15. 'tmux' 'split-window' '-d' '-t' 'mission-control-demo:workspace.0' '-h' '-p' '40' '-c' '/Users/you/pr…</text>
+  </g>
+</svg>

@@ -4,12 +4,15 @@
 
 It gives a project one human-readable YAML manifest and turns that manifest into a repeatable tmux session with windows, pane layouts, commands, hooks, status inspection, doctor checks, and dry-run output.
 
+![tmc help screenshot](docs/assets/screenshots/tmc-help.svg)
+
 ## Why
 
 - One command boots a named workspace instead of rebuilding it from memory.
 - Layouts are explicit, reviewable, and reusable across repos.
 - Startup and shutdown hooks are on disk, not trapped in shell history.
 - Dry-run prints the exact actions before anything mutates tmux state.
+- The workspace contract lives in the repo, where humans and agents can review, reuse, and audit it.
 
 ## Requirements
 
@@ -20,9 +23,19 @@ It gives a project one human-readable YAML manifest and turns that manifest into
 
 ## Install
 
+From source:
+
 ```bash
 go build -o ./bin/tmc ./cmd/tmc
 ```
+
+For Go users, after the first public release is tagged:
+
+```bash
+go install github.com/justyn-clark/tmux-mission-control/cmd/tmc@latest
+```
+
+Prebuilt macOS and Linux archives are produced by the release workflow for tagged versions. See [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md).
 
 ## Development
 
@@ -88,6 +101,8 @@ Machine-readable output is available for automation:
 ./bin/tmc status --session my-session --json
 ```
 
+![tmc dry-run screenshot](docs/assets/screenshots/tmc-dry-run.svg)
+
 ## Commands
 
 - `tmc init`
@@ -98,6 +113,7 @@ Machine-readable output is available for automation:
 - `tmc doctor [--file project.yml]`
 - `tmc dry-run --file project.yml [--detach] [--json]`
 - `tmc completion [bash|zsh|fish]`
+- `tmc version [--json]`
 
 ## Manifest Example
 
@@ -152,6 +168,8 @@ See [docs/layouts.md](docs/layouts.md) for pane-role ordering and ASCII diagrams
 - [docs/doctor.md](docs/doctor.md)
 - [docs/examples.md](docs/examples.md)
 - [docs/STATUS.md](docs/STATUS.md)
+- [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md)
+- [docs/VALUE.md](docs/VALUE.md)
 
 ## Notes
 

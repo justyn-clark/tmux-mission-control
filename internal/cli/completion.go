@@ -7,7 +7,7 @@ _tmc() {
   cur="${COMP_WORDS[COMP_CWORD]}"
   prev="${COMP_WORDS[COMP_CWORD-1]}"
   if [[ ${COMP_CWORD} -eq 1 ]]; then
-    COMPREPLY=( $(compgen -W "init start stop list status doctor dry-run completion help" -- "${cur}") )
+    COMPREPLY=( $(compgen -W "init start stop list status doctor dry-run completion version help" -- "${cur}") )
     return 0
   fi
   case "${prev}" in
@@ -32,6 +32,7 @@ _tmc() {
     'doctor:run dependency and manifest checks'
     'dry-run:print planned actions'
     'completion:emit shell completion'
+    'version:show build version'
     'help:show help'
   )
   _describe 'command' commands
@@ -40,6 +41,6 @@ compdef _tmc tmc
 `
 
 const fishCompletion = `complete -c tmc -f
-complete -c tmc -n "__fish_use_subcommand" -a "init start stop list status doctor dry-run completion help"
+complete -c tmc -n "__fish_use_subcommand" -a "init start stop list status doctor dry-run completion version help"
 complete -c tmc -n "__fish_seen_subcommand_from completion" -a "bash zsh fish"
 `

@@ -42,3 +42,4 @@ Each line is emitted as:
 - Command validation inspects the executable head command, not the full shell graph.
 - Hook and pane commands that rely on shell functions or aliases outside the selected shell environment may still fail at runtime.
 - `log_files` are only checked when they are explicitly configured.
+- Passing doctor means the manifest is plausible for this host. It is not a process health check and does not prove long-running commands will stay alive.

@@ -1,4 +1,4 @@
-module github.com/justynclarknetwork/tmux-mission-control
+module github.com/justyn-clark/tmux-mission-control
 
 go 1.25.0
 

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="168" viewBox="0 0 980 168" role="img" aria-label="tmc version terminal screenshot">
+  <rect width="100%" height="100%" rx="12" fill="#0b1020"/>
+  <rect x="0" y="0" width="100%" height="38" rx="12" fill="#111827"/>
+  <circle cx="24" cy="19" r="6" fill="#ff5f57"/>
+  <circle cx="44" cy="19" r="6" fill="#ffbd2e"/>
+  <circle cx="64" cy="19" r="6" fill="#28c840"/>
+  <text x="490" y="24" text-anchor="middle" fill="#94a3b8" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">tmc version</text>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14">
+<text x="28" y="66" fill="#a7f3d0">$ tmc version</text>
+<text x="28" y="84" fill="#d6deeb"></text>
+<text x="28" y="102" fill="#d6deeb">tmc dev</text>
+<text x="28" y="120" fill="#d6deeb">commit: unknown</text>
+<text x="28" y="138" fill="#d6deeb">built: unknown</text>
+  </g>
+</svg>

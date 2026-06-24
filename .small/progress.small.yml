@@ -25,3 +25,9 @@ entries:
       status: completed
       task_id: task-4
       timestamp: "2026-06-24T18:34:37.000000000Z"
+    - command: git remote set-url origin git@github.com:justyn-clark/tmux-mission-control.git && go test -count=1 ./... && make format-check && small check --strict && DIST_DIR=/tmp/tmc-release-check scripts/build-release.sh v0.0.0-test
+      evidence: Confirmed the remote points to the personal justyn-clark account, switched the Go module/import path, added version and release build plumbing, added a tag-based GitHub release workflow, generated sanitized SVG terminal screenshots from real tmc output, and documented install/distribution/value paths.
+      notes: Release smoke built darwin/linux amd64/arm64 archives and SHA256SUMS under /tmp/tmc-release-check.
+      status: completed
+      task_id: task-5
+      timestamp: "2026-06-24T20:42:20.000000000Z"

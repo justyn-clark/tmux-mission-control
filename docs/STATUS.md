@@ -10,6 +10,8 @@
 - `tmc start` creates managed tmux sessions and records session/pane metadata.
 - `tmc list` and `tmc status` inspect tmux state.
 - `tmc stop` tears down a session and runs manifest-backed shutdown hooks.
+- `tmc version` reports release build metadata.
+- Release plumbing builds macOS and Linux archives from tags.
 
 ## Product Boundaries
 
@@ -24,6 +26,7 @@ Preset layouts remain the supported model. Custom layout engines may become valu
 - A missing recorded manifest during `tmc stop` prevents reliable shutdown-hook execution.
 - The CLI has no daemon state; recovery is based on tmux metadata and explicit manifests.
 - Integration coverage uses isolated tmux sockets; it does not exercise every possible host tmux configuration.
+- Distribution assumes users already have `tmux` installed.
 
 ## Roadmap
 
@@ -31,4 +34,5 @@ Preset layouts remain the supported model. Custom layout engines may become valu
 2. Continue hardening lifecycle execution around partial failures, host tmux differences, and command-level failure reporting.
 3. Improve operator output with additional filters and stable JSON fields as automation use cases emerge.
 4. Expand isolated tmux integration tests around multi-window sessions, hook failures, and partial cleanup.
-5. Keep README and manifest docs aligned with actual CLI behavior before adding new features.
+5. Add Homebrew tap packaging after the first stable GitHub release.
+6. Keep README and manifest docs aligned with actual CLI behavior before adding new features.
