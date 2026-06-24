@@ -31,3 +31,9 @@ entries:
       status: completed
       task_id: task-5
       timestamp: "2026-06-24T20:42:20.000000000Z"
+    - command: go install github.com/justyn-clark/tmux-mission-control/cmd/tmc@v0.1.0
+      evidence: Public go install succeeded, then exposed that source installs reported version dev because ldflags are only applied by release builds. Added runtime/debug build-info fallback so module-version installs can report the tagged version.
+      notes: Follow-up patch release should verify tmc version --json after go install reports the module tag.
+      status: completed
+      task_id: task-5
+      timestamp: "2026-06-24T20:55:10.000000000Z"

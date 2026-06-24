@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 
 	"github.com/justyn-clark/tmux-mission-control/internal/doctor"
@@ -380,15 +381,58 @@ func runVersion(args []string, stdout io.Writer) error {
 	}
 
 	info := map[string]string{
-		"version": Version,
-		"commit":  Commit,
-		"date":    Date,
+		"version": effectiveVersion(),
+		"commit":  effectiveCommit(),
+		"date":    effectiveDate(),
 	}
 	if *jsonOutput {
 		return writeJSON(stdout, info)
 	}
 	_, err := fmt.Fprintf(stdout, "tmc %s\ncommit: %s\nbuilt: %s\n", Version, Commit, Date)
 	return err
+}
+
+func effectiveVersion() string {
+	if Version != "" && Version != "dev" {
+		return Version
+	}
+	if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" && info.Main.Version != "(devel)" {
+		return info.Main.Version
+	}
+	return Version
+}
+
+func effectiveCommit() string {
+	if Commit != "" && Commit != "unknown" {
+		return Commit
+	}
+	if value := buildSetting("vcs.revision"); value != "" {
+		return value
+	}
+	return Commit
+}
+
+func effectiveDate() string {
+	if Date != "" && Date != "unknown" {
+		return Date
+	}
+	if value := buildSetting("vcs.time"); value != "" {
+		return value
+	}
+	return Date
+}
+
+func buildSetting(key string) string {
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return ""
+	}
+	for _, setting := range info.Settings {
+		if setting.Key == key {
+			return setting.Value
+		}
+	}
+	return ""
 }
 
 func completionScript(shell string) (string, error) {
